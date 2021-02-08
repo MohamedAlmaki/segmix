@@ -1,1 +1,1 @@
-# segmix
+# SegMix
