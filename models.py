@@ -46,7 +46,7 @@ def save_checkpoint(model, path, optimizer, epoch, best_acc):
         torch.save(state, path) 
     
 def load_checkpoint(model, path, optimizer, epoch, best_acc):
-    assert(os.path.isdir(path))
+    assert(os.path.exists(path))
     checkpoint = torch.load(path)
     
     model.load_state_dict(checkpoint['state'])

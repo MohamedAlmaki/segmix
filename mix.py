@@ -1,6 +1,6 @@
 import torch
 import numpy as np 
-from models import get_resnet18_modified
+from .models import get_resnet18_modified
 from abc import ABC, abstractmethod
 
 
