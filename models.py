@@ -36,23 +36,24 @@ def load_model(name, pretrained=False, num_classes=10):
         raise ModelsException("Unknown model name. please select one of the supported models")
     
 def save_checkpoint(model, path, optimizer, epoch, best_acc): 
-    if not os.path.exists(path):
-        state = {
-            "state": model.state_dict(),
-            "optim": optimizer.state_dict(), 
-            "epoch": epoch, 
-            "best_acc": best_acc
-        }
-        torch.save(state, path) 
+    state = {
+        "state": model.state_dict(),
+        "optim": optimizer.state_dict(), 
+        "epoch": epoch, 
+        "best_acc": best_acc
+    }
+    torch.save(state, path) 
     
-def load_checkpoint(model, path, optimizer, epoch, best_acc):
+def load_checkpoint(path, model, optimizer):
     assert(os.path.exists(path))
-    checkpoint = torch.load(path)
     
+    checkpoint = torch.load(path)
     model.load_state_dict(checkpoint['state'])
     optimizer.load_state_dict(checkpoint['optim'])
-    epoch = int(checkpoint['epoch'])
+    last_epoch = int(checkpoint['epoch'])
     best_acc = float(checkpoint['best_acc'])
+    
+    return model, optimizer, last_epoch, best_acc
     
     
         
