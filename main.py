@@ -12,8 +12,8 @@ from mix import Mixup
 from logger import CSVLogger
 
 def main(): 
-    device = "cuda"
-    resume = False
+    device = "cpu"  
+    resume = True
     mpath = "./checkpoint.pth"
     logpath = "./log.csv"
     dpath = "./dataset"
@@ -27,7 +27,7 @@ def main():
     best_acc, s_epoch = 0, 0
     
     if resume: 
-        load_checkpoint(model, mpath, optimizer, s_epoch, best_acc)
+        model, optimizer, s_epoch, best_acc  = load_checkpoint(mpath, model, optimizer)
 
     train_transforms, test_transforms = getTransfroms()
     trainset, trainloader, testset, testloader, classes = getDatasetLoaders(Dataset.cifar10, dpath, train_transforms, test_transforms)
