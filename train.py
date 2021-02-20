@@ -18,7 +18,7 @@ class Trainer(ABC):
     
 class MixTrainer(Trainer): 
     def __init__(self, model, trainloader, criterion, optimizer, mixmethod, lr_scheduler=None,  device="cuda"): 
-        Trainer.__init__(self, model.to(device), trainloader, criterion, optimizer, lr_scheduler=lr_scheduler,  device=device)
+        Trainer.__init__(self, model, trainloader, criterion, optimizer, lr_scheduler=lr_scheduler,  device=device)
         self.mixmethod = mixmethod
 
     def train(self, epoch): 
