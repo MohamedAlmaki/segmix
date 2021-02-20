@@ -1,11 +1,11 @@
 import torch
 from abc import ABC, abstractmethod
-from mix import mixup_criterion, MixMethod
-from models import save_checkpoint
+from .mix import mixup_criterion, MixMethod
+from .models import save_checkpoint
 
 class Trainer(ABC): 
     def __init__(self, model, trainloader, criterion, optimizer, lr_scheduler=None,  device="cuda"): 
-        self.model = model
+        self.model = model.to(device)
         self.trainloader = trainloader
         self.criterion = criterion
         self.optimizer = optimizer 
@@ -18,7 +18,7 @@ class Trainer(ABC):
     
 class MixTrainer(Trainer): 
     def __init__(self, model, trainloader, criterion, optimizer, mixmethod, lr_scheduler=None,  device="cuda"): 
-        Trainer.__init__(self, model, trainloader, criterion, optimizer, lr_scheduler=lr_scheduler,  device=device)
+        Trainer.__init__(self, model.to(device), trainloader, criterion, optimizer, lr_scheduler=lr_scheduler,  device=device)
         self.mixmethod = mixmethod
 
     def train(self, epoch): 
@@ -46,7 +46,6 @@ class MixTrainer(Trainer):
             loss.backward()
             self.optimizer.step()
             self.lr_scheduler.step()
-            print(batch_idx)
 
         train_acc = 100.0*correct/total
         final_loss = train_loss/(batch_idx+1)
