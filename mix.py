@@ -32,8 +32,47 @@ class Mixup(MixMethod):
         y_a, y_b = y, y[index]
         return mixed_x, y_a, y_b, lam
     
+class CutMix(MixMethod): 
+  def rand_bbox(self, size, lam):
+    W = size[2]
+    H = size[3]
+
+    cut_rat = np.sqrt(1. - lam)
+    cut_w = np.int(W * cut_rat)
+    cut_h = np.int(H * cut_rat)
+
+    cx = np.random.randint(W)
+    cy = np.random.randint(H)
+
+    bbx1 = np.clip(cx - cut_w // 2, 0, W)
+    bby1 = np.clip(cy - cut_h // 2, 0, H)
+    bbx2 = np.clip(cx + cut_w // 2, 0, W)
+    bby2 = np.clip(cy + cut_h // 2, 0, H)
+
+    return bbx1, bby1, bbx2, bby2
+
+  def mix_data(self, x, y): 
+    if self.alpha > 0:
+      lam = np.random.beta(self.alpha, self.alpha)
+    else:
+      lam = 1
+
+    rand_index = torch.randperm(x.size()[0]).to(self.device)
+
+    target_a = y
+    target_b = y[rand_index]
+
+    bbx1, bby1, bbx2, bby2 = self.rand_bbox(x.size(), lam)
+    x[:, :, bbx1:bbx2, bby1:bby2] = x[rand_index, :, bbx1:bbx2, bby1:bby2]
+
+    # adjust lambda to exactly match pixel ratio
+    lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (x.size()[-1] * x.size()[-2]))
+
+    return x, target_a, target_b, lam 
+
 class Segmix(MixMethod): 
-    def __init__(self, segmodel): 
+    def __init__(self, segmodel, alpha, device): 
+        super().__init__(alpha, device)
         self.segmodel = segmodel
     
     @abstractmethod    
