@@ -7,6 +7,7 @@ from enum import Enum
 
 class Model(Enum): 
     resnet18 = "resnet18"
+    resnet18_modified = "resnet18_modified"
     
 class ModelsException(Exception): 
     pass 
@@ -32,6 +33,8 @@ def get_resnet18_modified(pretrained=False, num_classes=10):
 def load_model(name, pretrained=False, num_classes=10): 
     if name == Model.resnet18: 
         return get_resnet18(pretrained=pretrained, num_classes=num_classes)
+    elif name == Model.resnet18_modified: 
+        return get_resnet18_modified(pretrained=pretrained, num_classes=num_classes)
     else: 
         raise ModelsException("Unknown model name. please select one of the supported models")
     
