@@ -5,7 +5,7 @@ from .models import save_checkpoint
 
 class Trainer(ABC): 
     def __init__(self, model, trainloader, criterion, optimizer, lr_scheduler=None,  device="cuda"): 
-        self.model = model.to(device)
+        self.model = model
         self.trainloader = trainloader
         self.criterion = criterion
         self.optimizer = optimizer 
