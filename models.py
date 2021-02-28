@@ -1,16 +1,22 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
-from torchvision.models import resnet18
+from torchvision.models import resnet18, resnet50
 import os
 from enum import Enum
 
 class Model(Enum): 
     resnet18 = "resnet18"
     resnet18_modified = "resnet18_modified"
+    resnet50 = "resnet50"
     
 class ModelsException(Exception): 
     pass 
+
+def get_resnet50(pretrained=False, num_classes=10):
+    model = resnet50(pretrained=pretrained)
+    model.fc = nn.Linear(2048, num_classes)
+    return model
 
 def get_resnet18(pretrained=False, num_classes=10):
     model = resnet18(pretrained=pretrained)
@@ -35,6 +41,8 @@ def load_model(name, pretrained=False, num_classes=10):
         return get_resnet18(pretrained=pretrained, num_classes=num_classes)
     elif name == Model.resnet18_modified: 
         return get_resnet18_modified(pretrained=pretrained, num_classes=num_classes)
+    elif name == Model.resnet50: 
+        return get_resnet50(pretrained=pretrained, num_classes=num_classes)
     else: 
         raise ModelsException("Unknown model name. please select one of the supported models")
     

@@ -107,6 +107,40 @@ class Cifar10Segmix(Segmix):
         mixed_x = lam * x.to(self.device) + (1 - lam) * x2.to(self.device)
         y_a, y_b = y, y[index]
         return mixed_x, y_a, y_b, lam
+
+class Cifar10DoubleSegmix(Segmix): 
+    def attention(self, x):
+        return torch.sigmoid(torch.logsumexp(x, 1, keepdim=True))
+    
+    def get_segmented_images(self, x):
+        preds = self.segmodel(x.to(self.device))
+        attn = self.attention(preds)
+        attn = torch.cat((attn, attn, attn), dim=1)
+        attn[attn < 0.3] = 0.0
+        attn[attn >= 0.3] = 1.0
+        x = x.to(self.device) * attn.to(self.device)
+        return x
+    
+    def mix_data(self, x, y):
+        '''Returns mixed inputs, pairs of targets, and lambda'''
+        if self.alpha > 0:
+            lam = np.random.beta(self.alpha, self.alpha)
+        else:
+            lam = 1.
+
+        batch_size = x.size()[0]    
+        index = torch.randperm(batch_size).to(self.device)
+
+        x3 = self.get_segmented_images(x)
+        x2 = x3[index, :]
+        x4 = x[index]
+        
+        mixed1 = lam * x.to(self.device) + (1 - lam) * x2.to(self.device)
+        mixed2 = lam * x3.to(self.device) + (1 - lam) * x4.to(self.device)
+        
+        y_a, y_b = y, y[index]
+        
+        return mixed1, mixed2, y_a, y_b, lam
         
 
 
