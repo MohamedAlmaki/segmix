@@ -6,6 +6,10 @@ from torchvision.datasets import VisionDataset
 import PIL.Image as Image
 import gdown, tarfile, os, re
 
+
+"""
+    Utility function used for creating dataset in segmented cifar10
+"""
 def make_dataset(root_dir): 
   expr = "\d+"
   samples = []
@@ -23,6 +27,18 @@ def make_dataset(root_dir):
 
   return samples
 
+"""
+    root_dir: is the root dir of the dataset
+    train: True -> train dataset False -> test dataset 
+    transform: a transform applied to the pictures 
+    target_transform: a transform applied to the targets
+    attentions_transform: a transform applied to the attentions 
+    
+    sample format: image, attentions, target 
+    image: (32, 32, 3) pil image (without transform)
+    attentions: (6, 32, 32, 3)  the six output attentions from dino
+    target: the index of the target class
+"""
 class SegmentedCifar10(VisionDataset): 
   """Cifar10 with segmentation dataset."""
   def __init__(self, root_dir, train=True, download=False, transform=None, target_transform=None, attentions_transform=None):
